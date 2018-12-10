@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel = 'stylesheet' href = 'style.css'>  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>-->
+    <!--<script src="https://d3js.org/d3.v5.min.js"></script>-->
+    <script type="text/javascript" src="myscript.js"></script>
+  </head>
+
+  <body>
+    <div style="width:100%;">
+      <header>
+        <h1 style="text-align: right; padding: 30px 50px; font-size: 40pt; color: #174250;">Emojis Meet Devices</h1>
+      </header>
+
+
+      <div style = "height:800px; width:15%; float:left; padding: 5px 5px 5px 40px; margin: 5px;">
+        <div>
+          <p><h3>Device/Source Filter</h3></p>
+        </div>
+        <div class='sources_selection'>
+          <input type="checkbox" name="source_filter" id="iPhone" class='chk-btn'>
+          <label for='iPhone'>iPhone</label>
+        </div>
+        <div class='sources_selection'>
+          <input type="checkbox" name="source_filter" id="Android" class='chk-btn'>
+          <label for='Android'>Android Devices</label>
+        </div>
+        <div class='sources_selection'>
+          <input type="checkbox" name="source_filter" id="Web_Client" class='chk-btn'>
+          <label for='Web_Client'>Web Client</label>
+        </div>
+        <div class='sources_selection'>
+          <input type="checkbox" name="source_filter" id="iPad" class='chk-btn'>
+          <label for='iPad'>iPad</label>
+        </div>
+        <div class='sources_selection'>
+          <input type="checkbox" name="source_filter" id="Twitter_Lite" class='chk-btn'>
+          <label for='Twitter_Lite'>Twitter Lite</label>
+        </div>
+        <div class='sources_selection'>
+          <input type="checkbox" name="source_filter" id="TweetDeck" class='chk-btn'>
+          <label for='TweetDeck'>TweetDeck</label>
+        </div>
+        <div class='sources_selection'>
+          <input type="checkbox" name="source_filter" id="Instagram" class='chk-btn'>
+          <label for='Instagram'>Instagram</label>
+        </div>
+        <div class='sources_selection'>
+          <input type="checkbox" name="source_filter" id="Facebook" class='chk-btn'>
+          <label for='Facebook'>Facebook</label>
+        </div>
+      </div>
+
+
+      <div style = "height:790px; width:50%; float:left; padding: 5px; margin: 5px;">
+        <div style = "height:50%; width: 100%; margin: 0 0 5px 0;">
+          <div id="map" style = "height:100%; width: 100%"></div>
+        </div>
+        <div id='container' style="width: 100%; margin: 5px 0 0 0">
+          <svg />
+        </div>
+      </div>
+
+
+      <div style = "height:800px; width:20%; float:left; padding: 5px 40px 20px 5px; margin: 5px;">
+        <div>
+          <p><h3>Emoji Filter</h3></p>
+        </div>
+        <div id='emoji_selection'></div>
+      </div>
+
+
+      <div style="width: 100%; float:right; background: #2B5766; text-align: center;">
+        <h3 style="color: ghostwhite;">Emoji Usage Study</h3>
+      </div>
+    <div>
+    <script>
+      var emojikey = 'AIzaSyBj0iQLmVRaMtMXzk_aqKZiugQHSdJO-_8';
+      var data_path = 'result/loc/js/marker_all.js';
+      var markers = [];
+
+      // Initialize and add the map
+      var agadez = {lat: 16.9742, lng: 7.9865};
+
+      function identify_source(text){
+        var source_list = ['iPhone','Android','Web Client','iPad','Twitter Lite','TweetDeck','Instagram','Facebook'];
+        var final_source ='';
+
+        for(i=0; i<source_list.length; i++){
+          if(text.includes(source_list[i])){
+            final_source = source_list[i];
+            break;
+          }
+        }
+
+        if(final_source==='Web Client'){final_source = 'Web_Client';}
+        else if(final_source==='Twitter Lite'){final_source = 'Twitter_Lite';}
+        if(final_source===''){final_source='other';}
+        return final_source;
+      }
+
+      function find_most(emoji_list){
+        var most_emoji;
+        var current_count = 0;
+        for(i=0;i<emoji_list.length;i++){
+          if(emoji_list[i].emoji_count>current_count){
+            current_count = emoji_list[i].emoji_count;
+            most_emoji = emoji_list[i].emoji_type;
+          }
+        }
+        return most_emoji;
+      }
+
+      function initMap() {
+        /*/*Create a map object and put it into the div element*/
+        console.log('initMap');
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: agadez,
+          zoom: 2
+        });
+        //Create a <script> tag and set the USGS URL as the source.
+        var script = document.createElement('script');
+        script.src = data_path;
+        document.getElementsByTagName('head')[0].appendChild(script);
+      }
+      window.tweetfeed_callback = function(results){
+        console.log('tweetfeed_callback', results.features.length);
+        for (var i = 0; i < results.features.length; i++) {
+          try{
+            var coordinates = results.features[i].emoji_info.coordinates;
+            var tweet_latlon = new google.maps.LatLng(coordinates[0],coordinates[1]);
+            var tweet_source = identify_source(results.features[i].source);
+            var tweet_country = results.features[i].emoji_info.country;
+            var tweet_title = tweet_source + '-' + tweet_country + '-' + results.features[i].text;
+            var tweet_emoji = results.features[i].emoji_info.tweet_text;
+            var tweet_label = find_most(tweet_emoji);
+            var marker_attr = {
+              position: tweet_latlon,
+              map: map,
+              //label: results.features[i].emoji_info.tweet_text[0].emoji_type,
+              label: tweet_label,
+              title: tweet_title,
+              zIndex: 3,
+              source: tweet_source,
+              country: tweet_country,
+              emojis: tweet_emoji
+            };
+            var marker = new google.maps.Marker(marker_attr);
+            markers.push(marker);
+          }
+          catch(err){
+            console.log(err);
+            continue;
+          }
+        }        
+      }
+      window.onload = function(){
+        load_emoji_selection();
+        load_bargraph();
+      }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBj0iQLmVRaMtMXzk_aqKZiugQHSdJO-_8&callback=initMap"
+    async defer></script>
+  </body>
+</html>

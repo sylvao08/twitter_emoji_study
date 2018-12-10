@@ -1,0 +1,124 @@
+html, body {
+        height: 1080px;
+        font-family: 'Open Sans', sans-serif;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        outline: 0;
+}
+
+header{
+  background-image: url('resources/emoji-on-iPhone.jpg'); 
+  background-repeat: no-repeat;
+  background-size: cover;
+  width:100%;
+  height: 160px;
+  margin: -21px 0 0 0;
+}
+
+div#layout{
+  height: 100%;
+}
+
+div.sources_selection {
+  margin: 10px 0 10px 0;
+  padding: 10px;
+}
+
+
+input.chk-btn {
+  display: none;
+}
+
+input.chk-btn + label {
+  border: 1px solid grey;
+  background: ghostwhite;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+input.chk-btn:not(:checked) + label:hover {
+  box-shadow: 0px 1px 3px;
+  
+}
+input.chk-btn + label:active,
+input.chk-btn:checked + label {
+  box-shadow: 0px 0px 3px inset;
+  background: #2E8B57;
+  color: #ffffff;
+  
+}
+
+div#container {
+  height: 400px;
+  width: 800px;
+  margin: auto;
+  background-color: #2F4A6D;
+}
+
+div.emoji_cb{
+  position: relative;
+  width: 20%;
+  height: 30px;
+  float: left;
+  margin: 1%;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+.bar {
+  fill: #80cbc4;
+}
+
+text {
+  font-size: 12px;
+  fill: #fff;
+}
+
+path{
+  stroke:gray;
+}
+
+line#limit {
+  stroke: #FED966;
+  stroke-width: 3;
+  stroke-dasharray: 3 6;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.grid .tick line {
+  stroke: #9FAAAE;
+  stroke-opacity: 0.3;
+}
+
+text.divergence {
+  font-size: 12px;
+  fill: white;
+  text-anchor: middle;
+}
+
+text.count {
+  font-size: 12px;
+  fill: white;
+  text-anchor: middle;
+}
+
+text.title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+text.label {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+text.source {
+  font-size: 10px;
+}
